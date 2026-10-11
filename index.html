@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>页面访问器 · 跳转 & 下载</title>
+    <title>页面访问器 · 跳转/下载/内套</title>
     <style>
         * {
             margin: 0;
@@ -27,9 +27,9 @@
             -webkit-backdrop-filter: blur(12px);
             border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 2rem;
-            padding: 2.5rem;
+            padding: 2rem;
             width: 100%;
-            max-width: 600px;
+            max-width: 1100px;
             box-shadow: 0 30px 45px -15px rgba(0, 0, 0, 0.6), inset 0 1px 2px rgba(255, 255, 255, 0.08);
         }
 
@@ -39,21 +39,21 @@
             text-transform: uppercase;
             color: #94a3b8;
             font-weight: 400;
-            margin-bottom: 0.5rem;
+            margin-bottom: 0.3rem;
             text-align: center;
         }
 
         .subtitle {
             text-align: center;
             color: #64748b;
-            font-size: 0.9rem;
-            margin-bottom: 2rem;
+            font-size: 0.85rem;
+            margin-bottom: 1.5rem;
             font-weight: 300;
         }
 
         .input-group {
             display: flex;
-            gap: 0.75rem;
+            gap: 0.6rem;
             margin-bottom: 0.75rem;
             flex-wrap: wrap;
         }
@@ -64,7 +64,7 @@
             background: rgba(0, 0, 0, 0.3);
             border: 1px solid rgba(255, 255, 255, 0.15);
             border-radius: 3rem;
-            padding: 0.9rem 1.4rem;
+            padding: 0.85rem 1.3rem;
             font-size: 1rem;
             color: #f1f5f9;
             outline: none;
@@ -84,19 +84,19 @@
 
         .button-row {
             display: flex;
-            gap: 0.75rem;
+            gap: 0.6rem;
             margin-bottom: 1rem;
             flex-wrap: wrap;
         }
 
         .btn {
             flex: 1;
-            min-width: 130px;
+            min-width: 110px;
             background: rgba(255, 255, 255, 0.08);
             border: 1px solid rgba(255, 255, 255, 0.15);
             border-radius: 3rem;
-            padding: 0.9rem 1.5rem;
-            font-size: 1rem;
+            padding: 0.85rem 1.2rem;
+            font-size: 0.95rem;
             font-weight: 500;
             color: #f1f5f9;
             cursor: pointer;
@@ -104,7 +104,7 @@
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            gap: 0.5rem;
+            gap: 0.4rem;
             white-space: nowrap;
             font-family: inherit;
         }
@@ -148,18 +148,30 @@
             box-shadow: 0 12px 24px -8px #10b981;
         }
 
+        .btn-embed {
+            background: linear-gradient(135deg, #a855f7, #7c3aed);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            box-shadow: 0 8px 20px -8px #a855f7;
+        }
+
+        .btn-embed:hover:not(:disabled) {
+            background: linear-gradient(135deg, #c084fc, #a855f7);
+            box-shadow: 0 12px 24px -8px #a855f7;
+        }
+
         .btn-icon {
-            font-size: 1.1rem;
+            font-size: 1.05rem;
             line-height: 1;
         }
 
         .hint {
             background: rgba(0, 0, 0, 0.25);
             border-radius: 1rem;
-            padding: 1rem 1.2rem;
+            padding: 0.9rem 1.1rem;
             border: 1px solid rgba(255, 255, 255, 0.06);
             color: #94a3b8;
-            font-size: 0.85rem;
+            font-size: 0.82rem;
             line-height: 1.7;
             margin-top: 0.5rem;
         }
@@ -171,10 +183,10 @@
 
         .hint code {
             background: rgba(0, 0, 0, 0.4);
-            padding: 0.15rem 0.5rem;
-            border-radius: 0.5rem;
+            padding: 0.12rem 0.45rem;
+            border-radius: 0.4rem;
             color: #7dd3fc;
-            font-size: 0.8rem;
+            font-size: 0.78rem;
         }
 
         .hint .warn {
@@ -185,28 +197,125 @@
             color: #f87171;
             font-size: 0.85rem;
             min-height: 1.2rem;
-            padding-left: 1.2rem;
-            margin-bottom: 0.5rem;
+            padding-left: 1rem;
+            margin-bottom: 0.4rem;
         }
 
         .status-msg {
             color: #34d399;
             font-size: 0.85rem;
             min-height: 1.2rem;
-            padding-left: 1.2rem;
-            margin-bottom: 0.5rem;
+            padding-left: 1rem;
+            margin-bottom: 0.4rem;
         }
 
+        /* 内套 iframe 区域 */
+        .embed-wrapper {
+            display: none;
+            margin-top: 1.2rem;
+            border-radius: 1.2rem;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            background: #0b1220;
+            box-shadow: 0 20px 40px -20px rgba(0, 0, 0, 0.8);
+        }
+
+        .embed-wrapper.active {
+            display: block;
+        }
+
+        .embed-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.6rem;
+            padding: 0.7rem 1rem;
+            background: rgba(0, 0, 0, 0.4);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .embed-url {
+            flex: 1;
+            color: #7dd3fc;
+            font-size: 0.8rem;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            font-family: ui-monospace, monospace;
+        }
+
+        .embed-actions {
+            display: flex;
+            gap: 0.4rem;
+            flex-shrink: 0;
+        }
+
+        .embed-btn {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 0.6rem;
+            padding: 0.3rem 0.7rem;
+            font-size: 0.75rem;
+            color: #cbd5e1;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            font-family: inherit;
+        }
+
+        .embed-btn:hover {
+            background: rgba(56, 189, 248, 0.25);
+            border-color: rgba(56, 189, 248, 0.4);
+            color: #e0f2fe;
+        }
+
+        .embed-btn.close-embed:hover {
+            background: rgba(248, 113, 113, 0.25);
+            border-color: rgba(248, 113, 113, 0.4);
+            color: #fecaca;
+        }
+
+        .embed-frame {
+            width: 100%;
+            height: 520px;
+            border: none;
+            display: block;
+            background: white;
+        }
+
+        /* 内套加载提示 */
+        .embed-loading {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(11, 18, 32, 0.95);
+            color: #94a3b8;
+            font-size: 0.9rem;
+            gap: 0.6rem;
+            z-index: 2;
+        }
+
+        .embed-frame-wrap {
+            position: relative;
+            min-height: 520px;
+        }
+
+        .embed-frame-wrap .embed-loading.hidden {
+            display: none;
+        }
+
+        /* 最近记录 */
         .recent {
-            margin-top: 1.5rem;
+            margin-top: 1.2rem;
         }
 
         .recent-title {
             color: #64748b;
-            font-size: 0.8rem;
+            font-size: 0.78rem;
             letter-spacing: 0.1em;
             text-transform: uppercase;
-            margin-bottom: 0.6rem;
+            margin-bottom: 0.5rem;
             padding-left: 0.3rem;
         }
 
@@ -214,6 +323,8 @@
             display: flex;
             flex-direction: column;
             gap: 0.4rem;
+            max-height: 180px;
+            overflow-y: auto;
         }
 
         .recent-item {
@@ -223,9 +334,9 @@
             background: rgba(255, 255, 255, 0.03);
             border: 1px solid rgba(255, 255, 255, 0.06);
             border-radius: 1rem;
-            padding: 0.6rem 1rem;
+            padding: 0.55rem 0.9rem;
             color: #cbd5e1;
-            font-size: 0.85rem;
+            font-size: 0.82rem;
             transition: all 0.15s ease;
             overflow: hidden;
         }
@@ -249,21 +360,21 @@
 
         .recent-actions {
             display: flex;
-            gap: 0.4rem;
+            gap: 0.35rem;
             flex-shrink: 0;
         }
 
         .mini-btn {
             background: rgba(255, 255, 255, 0.08);
             border: 1px solid rgba(255, 255, 255, 0.12);
-            border-radius: 0.6rem;
-            width: 30px;
-            height: 30px;
+            border-radius: 0.55rem;
+            width: 28px;
+            height: 28px;
             display: flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             transition: all 0.15s ease;
             color: #cbd5e1;
         }
@@ -280,58 +391,32 @@
             color: #a7f3d0;
         }
 
-        /* 进度条 */
-        .progress-bar {
-            display: none;
-            width: 100%;
-            height: 4px;
-            background: rgba(0, 0, 0, 0.3);
-            border-radius: 4px;
-            overflow: hidden;
-            margin-bottom: 0.75rem;
+        .mini-btn.embed-mini:hover {
+            background: rgba(168, 85, 247, 0.3);
+            border-color: rgba(168, 85, 247, 0.5);
+            color: #e9d5ff;
         }
 
-        .progress-bar.active {
-            display: block;
+        /* 滚动条美化 */
+        .recent-list::-webkit-scrollbar {
+            width: 6px;
         }
-
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg, #10b981, #38bdf8);
-            width: 0%;
-            transition: width 0.2s ease;
-            border-radius: 4px;
+        .recent-list::-webkit-scrollbar-track {
+            background: transparent;
         }
-
-        .progress-fill.indeterminate {
-            width: 30%;
-            animation: indeterminate 1.2s infinite ease-in-out;
+        .recent-list::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 3px;
         }
-
-        @keyframes indeterminate {
-            0% { transform: translateX(-100%); }
-            100% { transform: translateX(400%); }
-        }
-
-        .spinner {
-            display: inline-block;
-            width: 14px;
-            height: 14px;
-            border: 2px solid rgba(255, 255, 255, 0.3);
-            border-top-color: white;
-            border-radius: 50%;
-            animation: spin 0.7s linear infinite;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
+        .recent-list::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.3);
         }
     </style>
 </head>
 <body>
     <div class="card">
         <div class="title">🌐 页面访问器</div>
-        <div class="subtitle">输入网址 · 跳转 或 下载网页</div>
+        <div class="subtitle">跳转 · 下载 · 内套访问</div>
 
         <div class="input-group">
             <input 
@@ -351,21 +436,44 @@
             <button class="btn btn-download" id="downloadBtn">
                 <span class="btn-icon">⬇️</span> 下载网页
             </button>
-        </div>
-
-        <div class="progress-bar" id="progressBar">
-            <div class="progress-fill" id="progressFill"></div>
+            <button class="btn btn-embed" id="embedBtn">
+                <span class="btn-icon">🖼️</span> 内套访问
+            </button>
         </div>
 
         <div class="error-msg" id="errorMsg"></div>
         <div class="status-msg" id="statusMsg"></div>
 
+        <!-- 内套 iframe 区域 -->
+        <div class="embed-wrapper" id="embedWrapper">
+            <div class="embed-header">
+                <span class="embed-url" id="embedUrlLabel">about:blank</span>
+                <div class="embed-actions">
+                    <button class="embed-btn" id="embedReloadBtn" title="刷新">↻ 刷新</button>
+                    <button class="embed-btn" id="embedOpenBtn" title="新标签页打开">↗ 新标签</button>
+                    <button class="embed-btn close-embed" id="embedCloseBtn" title="关闭内套">✕ 关闭</button>
+                </div>
+            </div>
+            <div class="embed-frame-wrap">
+                <div class="embed-loading" id="embedLoading">
+                    <span class="spinner"></span> 正在加载页面...
+                </div>
+                <iframe 
+                    class="embed-frame" 
+                    id="embedFrame" 
+                    src="about:blank"
+                    sandbox="allow-same-origin allow-scripts allow-forms allow-popups allow-popups-to-escape-sandbox"
+                    referrerpolicy="no-referrer"
+                ></iframe>
+            </div>
+        </div>
+
         <div class="hint">
             <strong>💡 使用提示</strong><br>
             · 可以只输入域名，如 <code>baidu.com</code>，会自动补全 <code>https://</code><br>
-            · 按 <code>回车键</code> 快速访问<br>
-            · <span class="warn">⚠️ 下载功能</span>受浏览器同源策略限制，仅能下载允许跨域访问的网页<br>
-            · 若下载失败，会自动尝试在新标签页打开该网页供你手动保存（Ctrl+S）
+            · 按 <code>回车</code> 访问 · <code>Shift+回车</code> 下载 · <code>Ctrl+回车</code> 内套<br>
+            · <span class="warn">⚠️ 内套访问限制：</span>许多网站（如 Google、百度、淘宝等）会通过 <code>X-Frame-Options</code> 或 <code>CSP</code> 禁止被嵌入，此时内套会显示空白或报错，请改用「访问」或「下载」<br>
+            · <span class="warn">⚠️ 下载限制：</span>受浏览器同源策略影响，跨域网站可能下载失败，会自动降级为打开新标签页手动保存
         </div>
 
         <div class="recent" id="recentSection" style="display: none;">
@@ -382,14 +490,22 @@
             const urlInput = document.getElementById('urlInput');
             const goBtn = document.getElementById('goBtn');
             const downloadBtn = document.getElementById('downloadBtn');
+            const embedBtn = document.getElementById('embedBtn');
             const errorMsg = document.getElementById('errorMsg');
             const statusMsg = document.getElementById('statusMsg');
             const recentSection = document.getElementById('recentSection');
             const recentList = document.getElementById('recentList');
-            const progressBar = document.getElementById('progressBar');
-            const progressFill = document.getElementById('progressFill');
+
+            const embedWrapper = document.getElementById('embedWrapper');
+            const embedFrame = document.getElementById('embedFrame');
+            const embedLoading = document.getElementById('embedLoading');
+            const embedUrlLabel = document.getElementById('embedUrlLabel');
+            const embedReloadBtn = document.getElementById('embedReloadBtn');
+            const embedOpenBtn = document.getElementById('embedOpenBtn');
+            const embedCloseBtn = document.getElementById('embedCloseBtn');
 
             let isDownloading = false;
+            let currentEmbedUrl = '';
 
             // ========== 历史记录 ==========
             function getRecentList() {
@@ -441,17 +557,17 @@
                     const actions = document.createElement('div');
                     actions.className = 'recent-actions';
 
-                    // 访问按钮
+                    // 访问
                     const visitMini = document.createElement('div');
                     visitMini.className = 'mini-btn';
-                    visitMini.title = '访问';
+                    visitMini.title = '访问（新标签页）';
                     visitMini.textContent = '🚀';
                     visitMini.addEventListener('click', (e) => {
                         e.stopPropagation();
                         window.open(url, '_blank', 'noopener,noreferrer');
                     });
 
-                    // 下载按钮
+                    // 下载
                     const downloadMini = document.createElement('div');
                     downloadMini.className = 'mini-btn download-mini';
                     downloadMini.title = '下载网页';
@@ -462,8 +578,20 @@
                         downloadPage(url);
                     });
 
+                    // 内套
+                    const embedMini = document.createElement('div');
+                    embedMini.className = 'mini-btn embed-mini';
+                    embedMini.title = '内套访问';
+                    embedMini.textContent = '🖼️';
+                    embedMini.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        urlInput.value = url;
+                        embedPage(url);
+                    });
+
                     actions.appendChild(visitMini);
                     actions.appendChild(downloadMini);
+                    actions.appendChild(embedMini);
 
                     item.appendChild(urlSpan);
                     item.appendChild(actions);
@@ -483,13 +611,16 @@
             function validateUrl(url) {
                 try {
                     const parsed = new URL(url);
-                    if (parsed.protocol === 'http:' || parsed.protocol === 'https:') {
-                        const host = parsed.hostname;
-                        const isLocalhost = host === 'localhost' || host === '127.0.0.1';
-                        const isIp = /^\d+\.\d+\.\d+\.\d+$/.test(host);
-                        const hasDot = host.includes('.');
-                        if (!isLocalhost && !isIp && !hasDot) {
-                            return { ok: false, msg: '⚠️ 网址格式似乎不正确，请检查' };
+                    if (parsed.protocol === 'http:' || parsed.protocol === 'https:' ||
+                        parsed.protocol === 'file:' || parsed.protocol === 'data:') {
+                        if (parsed.protocol === 'http:' || parsed.protocol === 'https:') {
+                            const host = parsed.hostname;
+                            const isLocalhost = host === 'localhost' || host === '127.0.0.1';
+                            const isIp = /^\d+\.\d+\.\d+\.\d+$/.test(host);
+                            const hasDot = host.includes('.');
+                            if (!isLocalhost && !isIp && !hasDot) {
+                                return { ok: false, msg: '⚠️ 网址格式似乎不正确，请检查' };
+                            }
                         }
                     }
                     return { ok: true, url };
@@ -502,9 +633,7 @@
                 try {
                     const parsed = new URL(url);
                     let name = parsed.hostname + parsed.pathname;
-                    // 移除末尾斜杠
                     name = name.replace(/\/$/, '');
-                    // 替换非法字符
                     name = name.replace(/[\\/:*?"<>|]/g, '_');
                     if (!name) name = 'webpage';
                     return name + '.html';
@@ -523,7 +652,7 @@
                 statusMsg.textContent = '';
             }
 
-            // ========== 跳转功能 ==========
+            // ========== 跳转 ==========
             function goToUrl() {
                 const url = normalizeUrl(urlInput.value);
                 clearMessages();
@@ -546,22 +675,14 @@
                 urlInput.focus();
             }
 
-            // ========== 下载功能 ==========
+            // ========== 下载 ==========
             function setDownloading(state) {
                 isDownloading = state;
                 downloadBtn.disabled = state;
                 goBtn.disabled = state;
-                if (state) {
-                    progressBar.classList.add('active');
-                    progressFill.classList.add('indeterminate');
-                } else {
-                    progressBar.classList.remove('active');
-                    progressFill.classList.remove('indeterminate');
-                    progressFill.style.width = '0%';
-                }
+                embedBtn.disabled = state;
             }
 
-            // 方案A: 使用 fetch + blob 下载（支持跨域时会成功）
             async function tryFetchDownload(url) {
                 const response = await fetch(url, {
                     method: 'GET',
@@ -574,19 +695,11 @@
                 }
 
                 const blob = await response.blob();
-                // 确保是 HTML 或文本类型
-                const contentType = response.headers.get('content-type') || '';
-                if (!contentType.includes('text/html') && !contentType.includes('text/plain') && !contentType.includes('application/xhtml')) {
-                    // 不是网页类型也允许下载，但提示一下
-                    console.warn('Content-Type 不是 HTML:', contentType);
-                }
-
                 const filename = getSafeFilename(url);
                 triggerDownload(blob, filename);
                 return true;
             }
 
-            // 方案B: 使用 a 标签直接下载（适用于同源或服务器设置了 Content-Disposition）
             function tryDirectDownload(url) {
                 return new Promise((resolve) => {
                     const a = document.createElement('a');
@@ -596,16 +709,13 @@
                     document.body.appendChild(a);
                     a.click();
                     document.body.removeChild(a);
-
-                    // 无法准确判断是否成功，给个短暂延迟后认为成功
                     setTimeout(() => resolve(true), 300);
                 });
             }
 
-            // 方案C: 兜底 —— 在新标签页打开并提示用户 Ctrl+S
             function fallbackOpenAndHint(url) {
                 window.open(url, '_blank', 'noopener,noreferrer');
-                statusMsg.innerHTML = '💡 已在新标签页打开，请按 <code>Ctrl+S</code> (Mac: <code>⌘+S</code>) 保存网页';
+                statusMsg.innerHTML = '💡 已在新标签页打开，请按 <code>Ctrl+S</code> 保存网页';
             }
 
             function triggerDownload(blob, filename) {
@@ -617,7 +727,6 @@
                 document.body.appendChild(a);
                 a.click();
                 document.body.removeChild(a);
-                // 延迟释放
                 setTimeout(() => URL.revokeObjectURL(blobUrl), 5000);
             }
 
@@ -643,39 +752,110 @@
                     return;
                 }
 
-                // 记录历史
                 saveRecent(url);
-
                 setDownloading(true);
                 statusMsg.textContent = '⏳ 正在尝试下载网页...';
 
-                // 尝试 fetch 下载
                 try {
                     await tryFetchDownload(url);
                     statusMsg.textContent = '✅ 下载成功！';
                     urlInput.value = '';
                 } catch (fetchError) {
                     console.warn('fetch 下载失败，尝试直接下载:', fetchError);
-
-                    // 尝试直接 a 标签下载（同源或服务器支持时有效）
                     try {
                         await tryDirectDownload(url);
                         statusMsg.textContent = '✅ 已触发下载（若未开始请检查浏览器设置）';
                         urlInput.value = '';
                     } catch (directError) {
                         console.warn('直接下载也失败:', directError);
-                        // 兜底方案
                         fallbackOpenAndHint(url);
                         urlInput.value = '';
                     }
                 } finally {
                     setDownloading(false);
-                    // 清理消息
                     setTimeout(() => {
                         if (statusMsg.textContent.includes('下载成功') || statusMsg.textContent.includes('已触发')) {
                             statusMsg.textContent = '';
                         }
                     }, 4000);
+                }
+            }
+
+            // ========== 内套访问 ==========
+            function embedPage(targetUrl) {
+                const raw = targetUrl || urlInput.value;
+                const url = normalizeUrl(raw);
+                clearMessages();
+
+                if (!url) {
+                    showError('⚠️ 请输入网址');
+                    urlInput.focus();
+                    return;
+                }
+
+                const validation = validateUrl(url);
+                if (!validation.ok) {
+                    showError(validation.msg);
+                    return;
+                }
+
+                saveRecent(url);
+
+                // 显示内套区域
+                embedWrapper.classList.add('active');
+                currentEmbedUrl = url;
+                embedUrlLabel.textContent = url;
+                embedUrlLabel.title = url;
+
+                // 显示加载提示
+                embedLoading.classList.remove('hidden');
+
+                // 加载到 iframe
+                embedFrame.src = url;
+
+                // 滚动到内套区域
+                setTimeout(() => {
+                    embedWrapper.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }, 100);
+
+                statusMsg.textContent = '🖼️ 已在内套中打开（若空白说明目标网站禁止嵌入）';
+                setTimeout(() => {
+                    if (statusMsg.textContent.includes('内套中打开')) {
+                        statusMsg.textContent = '';
+                    }
+                }, 4000);
+
+                urlInput.value = '';
+            }
+
+            // iframe 加载完成
+            embedFrame.addEventListener('load', () => {
+                // 隐藏加载提示
+                embedLoading.classList.add('hidden');
+            });
+
+            // 关闭内套
+            function closeEmbed() {
+                embedWrapper.classList.remove('active');
+                embedFrame.src = 'about:blank';
+                currentEmbedUrl = '';
+                embedUrlLabel.textContent = 'about:blank';
+                embedLoading.classList.remove('hidden');
+                clearMessages();
+            }
+
+            // 刷新内套
+            function reloadEmbed() {
+                if (currentEmbedUrl) {
+                    embedLoading.classList.remove('hidden');
+                    embedFrame.src = currentEmbedUrl;
+                }
+            }
+
+            // 新标签页打开当前内套地址
+            function openEmbedInNewTab() {
+                if (currentEmbedUrl) {
+                    window.open(currentEmbedUrl, '_blank', 'noopener,noreferrer');
                 }
             }
 
@@ -686,12 +866,21 @@
                 downloadPage();
             });
 
+            embedBtn.addEventListener('click', () => {
+                embedPage();
+            });
+
+            embedCloseBtn.addEventListener('click', closeEmbed);
+            embedReloadBtn.addEventListener('click', reloadEmbed);
+            embedOpenBtn.addEventListener('click', openEmbedInNewTab);
+
             urlInput.addEventListener('keydown', (e) => {
                 if (e.key === 'Enter') {
                     e.preventDefault();
                     if (isDownloading) return;
-                    // 默认回车是访问，按住 Shift + 回车 是下载
-                    if (e.shiftKey) {
+                    if (e.ctrlKey || e.metaKey) {
+                        embedPage();
+                    } else if (e.shiftKey) {
                         downloadPage();
                     } else {
                         goToUrl();
@@ -703,7 +892,6 @@
                 clearMessages();
             });
 
-            // 初始化
             renderRecent();
 
             window.addEventListener('focus', () => {
